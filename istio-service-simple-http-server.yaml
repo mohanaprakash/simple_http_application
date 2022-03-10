@@ -1,0 +1,35 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: simple-http-server-virtual-service
+spec:
+  hosts:
+  - simple-http-server-service.default.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        host: simple-http-server-service.default.svc.cluster.local
+        port:
+            number: 8080
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: simple-http-server-destination-rule
+spec:
+  host: simple-http-server-service.default.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+      
+---
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: mesh-default
+  namespace: istio-system
+spec:
+  accessLogging:
+    - providers:
+      - name: envoy
